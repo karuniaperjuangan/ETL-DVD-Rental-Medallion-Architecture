@@ -1,0 +1,21 @@
+version: 2
+
+sources:
+  - name: dvd_rental
+    schema: public
+    tables:
+      - name: category
+      - name: film_category
+      - name: film
+      - name: inventory
+      - name: rental
+      - name: customer
+      - name: address
+      - name: payment
+      - name: staff
+      - name: language
+      - name: film_actor
+      - name: actor
+      - name: store
+      - name: city
+      - name: country
