@@ -41,7 +41,7 @@ if __name__== "__main__":
     #Load data form Postgres table and insert into duckdb
     for table in tables:
         print("Loading data from postgres table: ",table)
-        query = f"SELECT * FROM {table}"
+        query = f"SELECT * FROM {schema}.{table}"
         cursor = postgres_conn.cursor()
         cursor.execute(query)
         result = cursor.fetchall()

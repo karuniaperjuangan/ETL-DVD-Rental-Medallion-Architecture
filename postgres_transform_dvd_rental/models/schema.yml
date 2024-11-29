@@ -8,7 +8,9 @@ models:
           - unique
           - not_null
       - name: full_name
-      - name: email
+      - name: city
+      - name: country
+      - name: postal_code
       - name: active
 
   - name: dim_film
@@ -26,7 +28,9 @@ models:
       - name: replacement_cost
       - name: rating
       - name: special_features
-      - name: full_text
+      - name: fulltext
+      - name: language
+      - name: category
 
   - name: dim_staff
     columns:
@@ -35,44 +39,10 @@ models:
           - unique
           - not_null
       - name: full_name
-      - name: email
-      - name: username
-      - name: password
-      - name: picture
-      - name: active
-
-  - name: dim_category
-    columns:
-      - name: category_id
-        description: Primary key for categories.
-        tests:
-          - unique
-          - not_null
-      - name: name
-
-  - name: dim_language
-    columns:
-      - name: language_id
-        tests:
-          - unique
-          - not_null
-      - name: name
-
-  - name: dim_city
-    columns:
-      - name: city_id
-        tests:
-          - unique
-          - not_null
       - name: city
-
-  - name: dim_country
-    columns:
-      - name: country_id
-        tests:
-          - unique
-          - not_null
       - name: country
+      - name: postal_code
+      - name: active
 
   - name: fact_rental
     columns:
@@ -93,35 +63,17 @@ models:
           - relationships:
               to: ref('dim_customer')
               field: customer_id
-      - name: category_id
+      - name: store_id
         tests:
           - not_null
           - relationships:
-              to: ref('dim_category')
-              field: category_id
+              to: ref('dim_store')
+              field: store_id
       - name: film_id
         tests:
           - not_null
           - relationships:
               to: ref('dim_film')
               field: film_id
-      - name: language_id
-        tests:
-          - not_null
-          - relationships:
-              to: ref('dim_language')
-              field: language_id
-      - name: city_id
-        tests:
-          - not_null
-          - relationships:
-              to: ref('dim_city')
-              field: city_id
-      - name: country_id
-        tests:
-          - not_null
-          - relationships:
-              to: ref('dim_country')
-              field: country_id
       - name: rental_days
       - name: total_payment_amounts
