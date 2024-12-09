@@ -1,0 +1,174 @@
+
+version: 2
+
+models:
+  - name: raw_actor
+    columns:
+      - name: actor_id
+        tests:
+          - unique
+          - not_null
+      - name: first_name
+      - name: last_name
+      - name: last_update 
+
+  - name: raw_address
+    columns:
+      - name: address_id
+        tests:
+          - unique
+          - not_null
+      - name: address
+      - name: address2
+      - name: district
+      - name: city_id
+      - name: postal_code
+      - name: phone
+      - name: last_update
+
+  - name: raw_category
+    columns:
+      - name: category_id
+        tests:
+          - unique
+          - not_null
+      - name: name
+      - name: last_update
+
+  - name: raw_city
+    columns:
+      - name: city_id
+        tests:
+          - unique
+          - not_null
+      - name: city
+      - name: country_id
+      - name: last_update
+
+  - name: raw_country
+    columns:
+      - name: country_id
+        tests:
+          - unique
+          - not_null
+      - name: country
+      - name: last_update
+
+  - name: raw_customer
+    columns:
+      - name: customer_id
+        tests:
+          - unique
+          - not_null
+      - name: store_id
+      - name: first_name
+      - name: last_name
+      - name: email
+      - name: address_id
+      - name: activebool
+      - name: create_date
+      - name: last_update
+      - name: active
+
+  - name: raw_film_actor
+    columns:
+      - name: actor_id
+      - name: film_id
+      - name: last_update
+
+  - name: raw_film_category
+    columns:
+      - name: film_id
+      - name: category_id
+      - name: last_update
+
+  - name: raw_film
+    columns:
+      - name: film_id
+        tests:
+          - unique
+          - not_null
+      - name: title
+      - name: description
+      - name: release_year
+      - name: language_id
+      - name: rental_duration
+      - name: rental_rate
+      - name: length
+      - name: replacement_cost
+      - name: rating
+      - name: last_update
+      - name: special_features
+      - name: fulltext
+
+  - name: raw_inventory
+    columns:
+      - name: inventory_id
+        tests:
+          - unique
+          - not_null
+      - name: film_id
+      - name: store_id
+      - name: last_update
+
+  - name: raw_language
+    columns:
+      - name: language_id
+        tests:
+          - unique
+          - not_null
+      - name: name
+      - name: last_update
+
+  - name: raw_payment
+    columns:
+      - name: payment_id
+        tests:
+          - unique
+          - not_null
+      - name: customer_id
+      - name: staff_id
+      - name: rental_id
+      - name: amount
+      - name: payment_date
+
+  - name: raw_rental
+    columns:
+      - name: rental_id
+        tests:
+          - unique
+          - not_null
+      - name: rental_id
+      - name: rental_date
+      - name: inventory_id
+      - name: customer_id
+      - name: return_date
+      - name: staff_id
+      - name: last_update
+
+  - name: raw_staff
+    columns:
+      - name: staff_id
+        tests:
+          - unique
+          - not_null
+      - name: first_name
+      - name: last_name
+      - name: address_id
+      - name: email
+      - name: store_id
+      - name: active
+      - name: username
+      - name: password
+      - name: last_update
+      - name: picture
+
+  - name: raw_store
+    columns:
+      - name: store_id
+        tests:
+          - unique
+          - not_null
+      - name: manager_staff_id
+      - name: address_id
+      - name: last_update

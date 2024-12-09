@@ -13,6 +13,19 @@ models:
       - name: postal_code
       - name: active
 
+  - name: dim_date
+    columns:
+      - name: date_id
+        tests:
+          - unique
+          - not_null
+      - name: year
+      - name: quarter
+      - name: month
+      - name: week
+      - name: day_of_week
+      - name: day
+
   - name: dim_film
     columns:
       - name: film_id

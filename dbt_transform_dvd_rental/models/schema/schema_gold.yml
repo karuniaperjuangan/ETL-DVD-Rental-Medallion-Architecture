@@ -1,0 +1,36 @@
+version: 2
+
+models:
+  - name: mart_customer_transaction_data
+    columns:
+      - name: customer_id
+      - name: customer_name
+      - name: customer_city
+      - name: customer_country
+      - name: num_transactions
+      - name: total_spending_amount
+
+  - name: mart_film_transaction_data
+    columns:
+      - name: film_id
+      - name: title
+      - name: language
+      - name: genre
+      - name: num_transactions
+      - name: total_spending_amount
+
+  - name: mart_staff_performance_data
+    columns:
+      - name: staff_id
+      - name: staff_full_name
+      - name: staff_city
+      - name: staff_country
+      - name: num_transactions
+      - name: total_revenue
+
+  - name: mart_weekly_transaction
+    columns:
+      - name: week
+      - name: year
+      - name: num_transactions
+      - name: total_revenue
