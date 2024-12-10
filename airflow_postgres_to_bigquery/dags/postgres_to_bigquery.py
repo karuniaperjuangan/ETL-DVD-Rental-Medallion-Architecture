@@ -9,6 +9,10 @@ import dotenv
 import logging
 import json
 import pandas as pd
+from airflow.providers.postgres.operators.postgres import PostgresOperator
+from cosmos import DbtTaskGroup, ProjectConfig, ProfileConfig, ExecutionConfig
+from cosmos.profiles import PostgresUserPasswordProfileMapping
+
 logger = logging.getLogger(__name__)
 dotenv.load_dotenv()
 
@@ -18,12 +22,31 @@ default_args = {
     'retries': 1,
 }
 
-SCHEMA_NAME = 'dwh_silver'  # The schema you want to fetch tables from
+SCHEMA_NAME = 'dwh_gold' # schema that moved to bigquery
+DBT_TARGET_SCHEMA = 'dwh'
 POSTGRES_CONN_ID = 'postgres_local'
 GCP_CONN_ID='google_cloud_dvd_rental'
 GCS_BUCKET_NAME = os.getenv('GCS_BUCKET_NAME')
 BQ_PROJECT_ID = os.getenv('BQ_PROJECT_ID')
 BQ_DATASET_NAME = os.getenv('BQ_DATASET_NAME')
+# The path to the dbt project
+DBT_PROJECT_PATH = f"{os.environ['AIRFLOW_HOME']}/dags/dbt_transform_dvd_rental"
+# The path where Cosmos will find the dbt executable
+# in the virtual environment created in the Dockerfile
+DBT_EXECUTABLE_PATH = f"{os.environ['AIRFLOW_HOME']}/dbt_venv/bin/dbt"
+
+profile_config = ProfileConfig(
+    profile_name="dbt_transform_dvd_rental",
+    target_name="dev",
+    profile_mapping=PostgresUserPasswordProfileMapping(
+        conn_id=POSTGRES_CONN_ID,
+        profile_args={"schema": DBT_TARGET_SCHEMA},
+    ),
+)
+
+execution_config = ExecutionConfig(
+    dbt_executable_path=DBT_EXECUTABLE_PATH,
+)
 
 def get_table_names():
     """Fetches all table names from the specified schema in Postgres."""
@@ -45,12 +68,12 @@ def get_table_names():
 
 # Define the DAG
 with DAG(
-    dag_id='dynamic_postgres_to_bigquery',
+    dag_id='postgres__dbt_bigquery',
     default_args=default_args,
-    description='Dynamically load data from all tables in a Postgres schema to BigQuery',
+    description='Transform a schema in postgres database with medallion architecture using DBT, then load tables in transformed Postgres schema to BigQuery',
     schedule_interval=None,
     start_date=days_ago(1),
-    tags=['postgres', 'bigquery', 'dynamic'],
+    tags=['postgres', 'bigquery','dbt', 'dynamic'],
 ) as dag:
 
     # Mengambil nama-nama tabel
@@ -58,12 +81,20 @@ with DAG(
         task_id='get_tables',
         python_callable=get_table_names
     )
+    transform_data = DbtTaskGroup(
+        group_id="transform_data",
+        project_config=ProjectConfig(DBT_PROJECT_PATH),
+        profile_config=profile_config,
+        execution_config=execution_config,
+        default_args={"retries": 2},
+    )
 
     # Daftar task yang digenerate secara dinamis
     export_and_load_tasks = []
 
-    def generate_table_tasks(**kwargs):
-        """Dynamically create tasks for each table in the schema."""
+    def load_postgres_to_bigquery_task(**kwargs):
+        """Load postgres tables that have been transformed with dbt to Bigquery."""
+        
         tables = kwargs['ti'].xcom_pull(task_ids='get_tables')
         postgres_hook = PostgresHook(postgres_conn_id=POSTGRES_CONN_ID)
         gcs_hook = GCSHook(gcp_conn_id=GCP_CONN_ID)
@@ -105,11 +136,11 @@ with DAG(
                 autodetect=True
             )
 
-    generate_tasks = PythonOperator(
-        task_id='generate_table_tasks',
-        python_callable=generate_table_tasks,
+    load_postgres_to_bigquery_task = PythonOperator(
+        task_id='load_postgres_to_bigquery_task',
+        python_callable=load_postgres_to_bigquery_task,
         provide_context=True
     )
 
     # Set task dependencies
-    get_tables_names_task >> generate_tasks
+    transform_data >> get_tables_names_task >> load_postgres_to_bigquery_task
