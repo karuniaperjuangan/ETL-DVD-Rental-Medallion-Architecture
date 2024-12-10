@@ -9,7 +9,7 @@ This project is an ETL pipeline that processes a DVD rental database stored in a
 ## Architecture Diagram
 
 <div syle="display: flex; justify-content: space-around;">
-<img src="diagram/ETL Architecture.png" alt="ETL Architecture" style="height: 600px;"/>&nbsp;
+<img src="diagram/ETL Architecture.png" alt="ETL Architecture" style="width: 100%;"/>&nbsp;
 </div>
 
 ## Star Schema Transformation
